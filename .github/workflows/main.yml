@@ -152,24 +152,34 @@ jobs:
           CONFIG_KSU_SUSFS_OPEN_REDIRECT=y
           EOF
           
-          # -all Configs
             cat >> $DEFCONFIG <<EOF
-          CONFIG_CPU_FREQ=y
-          CONFIG_HIGH_RES_TIMERS=y
           CONFIG_LTO=y
           CONFIG_LTO_CLANG=y
           CONFIG_LTO_CLANG_THIN=y
+          CONFIG_THINLTO=y
+          CONFIG_SECURITY_SELINUX=y
+          CONFIG_SECURITY_SELINUX_DEVELOP=y
+          CONFIG_SLUB_DEBUG=n
+          CONFIG_PROVE_LOCKING=n
+          CONFIG_DEBUG_SPINLOCK=n
+          CONFIG_DEBUG_MUTEXES=n
+          CONFIG_WIREGUARD=y
+          CONFIG_NTFS_FS=y
+          CONFIG_NTFS3_FS=y
+          CONFIG_CPU_FREQ=y
+          CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+          CONFIG_CPU_FREQ_DEFAULT_GOV_SCHEDUTIL=y
+          CONFIG_UCLAMP_TASK=y
+          CONFIG_UCLAMP_TASK_GROUP=y
+          CONFIG_SCHED_TUNE=y
+          CONFIG_SCHED_CORE=y
+          CONFIG_HIGH_RES_TIMERS=y
           CONFIG_NO_HZ_COMMON=y
-          # CONFIG_HZ_PERIODIC is not set
           CONFIG_NO_HZ_IDLE=y
-          # CONFIG_NO_HZ_FULL is not set
           CONFIG_NO_HZ=y
           CONFIG_RCU_FAST_NO_HZ=y
-          # CONFIG_HZ_100 is not set
-          # CONFIG_HZ_250 is not set
-          # CONFIG_HZ_1000 is not set
-          CONFIG_NO_HZ_COMMON=y  
-          EOF
+          CONFIG_HZ_500=y
+          CONFIG_HZ=500
 
       - name: Setup Versioning
         working-directory: gki/common
