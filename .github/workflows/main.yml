@@ -97,7 +97,7 @@ jobs:
       - name: Setup KernelSU-Next & SUSFS Hook
         working-directory: gki/common
         run: |
-          echo "🧩 Setup KernelSU-Next & SUSFS
+          echo "🧩 Setup KernelSU-Next & SUSFS"
           curl -LSs "https://raw.githubusercontent.com/zixine/ZixineSu/refs/heads/master/kernel/setup.sh" | bash -s susfs-mambo-master
           
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 sus
