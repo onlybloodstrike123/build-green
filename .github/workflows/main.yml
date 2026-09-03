@@ -6,7 +6,7 @@ on:
       kernel_name:
         description: 'Nama Kernel (Akan menjadi nama final, misal: Zixine-V1)'
         required: true
-        default: 'Zixine-Elysium-inline-2.63'
+        default: 'Z-Ayliud-V1'
         type: string
 
 permissions:
@@ -98,11 +98,10 @@ jobs:
         working-directory: gki/common
         run: |
           echo "🧩 Setup KernelSU-Next & SUSFS"
-          curl -LSs "https://raw.githubusercontent.com/zixine/ZixineSu/refs/heads/master/kernel/setup.sh" | bash -s susfs-mambo-master
-          
+          curl -LSs "https://raw.githubusercontent.com/WildKernels/KernelSU-Next-Next/refs/heads/main/setup.sh" | bash -s susfs-mambo-kernelsu-next
+    
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 sus
-          cp -r sus/kernel_patches/fs .
-          cp -r sus/kernel_patches/include .
+          cp -rf sus/kernel_patches/* ./
           patch -p1 < sus/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
           sed -i '1i#include <linux/stat.h>' include/linux/susfs.h
           echo "✅ KernelSU-Next & SUSFS Ready."
