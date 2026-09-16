@@ -220,7 +220,7 @@ jobs:
 
       - name: Packaging & Release
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.ZIXINE }}
         run: |
           BASE_VER=$(make -s kernelversion -C gki/common | tr -d '\n\r')
           FULL_VER=$(make -s kernelversion -C gki/common | tr -d '\n\r')
