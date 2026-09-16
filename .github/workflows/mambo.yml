@@ -140,8 +140,8 @@ jobs:
         working-directory: gki/common
         run: |
           rm -rf drivers/staging/kernelsu drivers/kernelsu KernelSU
-          curl -LSs "https://raw.githubusercontent.com/Kingfinik98/VortexSU/refs/heads/main/kernel/setup.sh" | bash -s main
-
+          curl -LSs "https://raw.githubusercontent.com/RapliVx/KernelSU/xxksu/kernel/setup.sh" | bash -s xxksu
+          
       - name: Clean Build Config
         run: sed -i '2d' gki/common/build.config.gki
 
