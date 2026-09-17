@@ -218,31 +218,32 @@ jobs:
           # Tambahkan -Wno-error=implicit-function-declaration untuk bypass error header bandel
           LTO=thin KCFLAGS="-O3 -Wno-error=implicit-function-declaration -Wno-error=visibility" BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
 
-      - name: Generate tag and names
-        id: artifacts
+      - name: Packaging & Release (Combined)
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.ZIXINE }}
         run: |
-          echo "release_tag=v1.0-$(date +%Y%m%d)-${{ github.run_number }}" >> $GITHUB_OUTPUT
-          echo "build_name=Z-Lucia.V1-MamboSU - $(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-          echo "ZIP_NAME=Z-Lucia.V1-MamboSU" >> $GITHUB_ENV
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ZIP_NAME }}
-          path: ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
-          retention-days: 30
-          compression-level: 0
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.artifacts.outputs.release_tag }}
-          name: ${{ steps.artifacts.outputs.build_name }}
-          body: |
-            ## 🔧 ${{ inputs.KERNEL_NAME }} — Android 5.10 GKI Kernel
-          files: ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
-          draft: false
-          prerelease: false
+          DATE=$(date +"%Y%m%d")
+          # Tag unik berdasarkan nomor run agar semua matrix masuk ke satu halaman release
+          RELEASE_TAG="Zixine-GKI-Run-${{ github.run_number }}"
+          ZIP_NAME="RE-GKI-zixine-Elysium-inline-${DATE}.zip"
+          
+          git clone -q --depth=1 "https://github.com/zixine/anykernel" -b main anykernel
+          IMG=$(find gki/out -name "Image" -type f | head -n 1)
+          cp "$IMG" anykernel/
+          
+          FULL_VER=$(make -s kernelversion -C gki/common | tr -d '\n\r')
+          sed -i "s|kernel.string=.*|kernel.string=${FULL_VER} |g" anykernel/anykernel.sh
+          
+          cd anykernel
+          zip -r9 "../$ZIP_NAME" * -x .git .gitignore README.md
+          cd ..
+          
+          TARGET_REPO="zixine/Kernel-GKI-12-5.10-release"
+          
+          echo "🚀 Mengunggah $ZIP_NAME ke $TARGET_REPO..."
+          gh release create "$RELEASE_TAG" --repo "$TARGET_REPO" --title "ZixineSu add Build ${DATE}" --notes "p." --prerelease=false 2>/dev/null || true
+          gh release upload "$RELEASE_TAG" "$ZIP_NAME" --repo "$TARGET_REPO" --clobber
           
       - name: Archive Build Log
         if: always()
