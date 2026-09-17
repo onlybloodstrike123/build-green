@@ -218,12 +218,18 @@ jobs:
           # Tambahkan -Wno-error=implicit-function-declaration untuk bypass error header bandel
           LTO=thin KCFLAGS="-O3 -Wno-error=implicit-function-declaration -Wno-error=visibility" BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
 
+      - name: Generate tag and names
+        id: artifacts
+        run: |
+          echo "release_tag=v1.0-$(date +%Y%m%d)-${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "build_name=Z-Lucia.V1-MamboSU - $(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+          echo "ZIP_NAME=Z-Lucia.V1-MamboSU" >> $GITHUB_ENV
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ZIP_NAME }}
-          path: |
-            ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
+          path: ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
           retention-days: 30
           compression-level: 0
 
@@ -231,13 +237,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.artifacts.outputs.release_tag }}
-          name: "${{ steps.artifacts.outputs.build_name }}"
+          name: ${{ steps.artifacts.outputs.build_name }}
           body: |
             ## 🔧 ${{ inputs.KERNEL_NAME }} — Android 5.10 GKI Kernel
-          files: |
-            ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
+          files: ${{ github.workspace }}/dist/${{ env.ZIP_NAME }}.zip
           draft: false
           prerelease: false
+          
       - name: Archive Build Log
         if: always()
         uses: actions/upload-artifact@v4
