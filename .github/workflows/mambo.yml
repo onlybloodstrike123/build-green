@@ -222,14 +222,15 @@ jobs:
         if: success()
         env:
           GH_TOKEN: ${{ secrets.ZIXINE }}
+          TARGET_REPO: "zixine/Kernel-GKI-12-5.10-release"
         run: |
           DATE=$(date +"%Y%m%d")
-          # Tag unik berdasarkan nomor run agar semua matrix masuk ke satu halaman release
           RELEASE_TAG="Zixine-GKI-Run-${{ github.run_number }}"
           ZIP_NAME="RE-GKI-zixine-Elysium-inline-${DATE}.zip"
           
           git clone -q --depth=1 "https://github.com/zixine/anykernel" -b main anykernel
           IMG=$(find gki/out -name "Image" -type f | head -n 1)
+          if [ -z "$IMG" ]; then echo "Image not found!"; find gki/out -type f | head -n 20; exit 1; fi
           cp "$IMG" anykernel/
           
           FULL_VER=$(make -s kernelversion -C gki/common | tr -d '\n\r')
@@ -238,11 +239,16 @@ jobs:
           cd anykernel
           zip -r9 "../$ZIP_NAME" * -x .git .gitignore README.md
           cd ..
+          ls -lh "$ZIP_NAME"
           
-          TARGET_REPO="zixine/Kernel-GKI-12-5.10-release"
+          # Auth explicit untuk repo target
+          echo "$GH_TOKEN" | gh auth login --with-token
           
           echo "🚀 Mengunggah $ZIP_NAME ke $TARGET_REPO..."
-          gh release create "$RELEASE_TAG" --repo "$TARGET_REPO" --title "ZixineSu add Build ${DATE}" --notes "p." --prerelease=false 2>/dev/null || true
+          # Hapus 2>/dev/null biar keliatan error aslinya
+          if ! gh release view "$RELEASE_TAG" --repo "$TARGET_REPO" > /dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$TARGET_REPO" --title "ZixineSu add Build ${DATE}" --notes "Build $FULL_VER" --prerelease=false
+          fi
           gh release upload "$RELEASE_TAG" "$ZIP_NAME" --repo "$TARGET_REPO" --clobber
           
       - name: Archive Build Log
